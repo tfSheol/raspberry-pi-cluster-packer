@@ -1,0 +1,82 @@
+{
+  "variables": {},
+  "builders": [{
+    "type": "arm",
+    "file_urls" : ["http://cdimage.ubuntu.com/releases/20.10/release/ubuntu-20.10-preinstalled-server-arm64+raspi.img.xz"],
+    "file_checksum_url": "http://cdimage.ubuntu.com/releases/20.10/release/SHA256SUMS",
+    "file_checksum_type": "sha256",
+    "file_target_extension": "xz",
+    "file_unarchive_cmd": ["xz", "--decompress", "$ARCHIVE_PATH"],
+    "image_build_method": "reuse",
+    "image_path": "ubuntu-20.04.img",
+    "image_size": "3.1G",
+    "image_type": "dos",
+    "image_partitions": [
+      {
+        "name": "boot",
+        "type": "c",
+        "start_sector": "2048",
+        "filesystem": "fat",
+        "size": "256M",
+        "mountpoint": "/boot/firmware"
+      },
+      {
+        "name": "root",
+        "type": "83",
+        "start_sector": "526336",
+        "filesystem": "ext4",
+        "size": "2.8G",
+        "mountpoint": "/"
+      }
+
+    ],
+    "image_chroot_env": ["PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"],
+    "qemu_binary_source_path": "/usr/bin/qemu-aarch64-static",
+    "qemu_binary_destination_path": "/usr/bin/qemu-aarch64-static"
+  }],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "echo \"cgroup_enable=memory cgroup_memory=1 dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc quiet splash\" > /boot/firmware/cmdline.txt",
+        "cat /boot/firmware/cmdline.txt"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "touch /ssh"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "mv /etc/resolv.conf /etc/resolv.conf.bk",
+        "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "apt-get remove docker docker.io containerd runc",
+        "apt-get update",
+        "apt-get install apt-transport-https ca-certificates curl gnupg lsb-release -y",
+        "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg",
+        "echo \"deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\" | tee /etc/apt/sources.list.d/docker.list > /dev/null",
+        "apt-get update",
+        "apt-get install docker-ce docker-ce-cli containerd.io -y",
+        "systemctl enable docker.service",
+        "systemctl enable containerd.service",
+        ""
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "curl -L \"https://github.com/docker/compose/releases/download/1.28.5/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose",
+        "chmod +x /usr/local/bin/docker-compose"
+      ]
+    }
+  ],
+  "post-processors": []
+}
