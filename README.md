@@ -4,7 +4,7 @@
 
 ```bash
 $ sudo apt install qemu binfmt-support qemu-user-static
-$ sudo update-binfmts --display
+$ sudo apt-get install qemu-utils qemu-efi-aarch64 qemu-system-arm
 ```
 
 ### Install packer 1.7.0 or more
@@ -43,8 +43,110 @@ $ sudo ln -s /proc/self/mounts /etc/mtab
 ## Usage
 
 ```bash
-$ ./build.sh
+$ ./cluster.sh
+= set param working.directory to .
+= set param config.file.path to .
+= set param config.file.name to config.properties
+= set param debug to false
+= set config boards to raspios ubuntu
+= set config image.size to 4.5G
+= set config image.type to dos
+= set config packer.type to arm
+= set config qemu.binary to qemu-aarch64-static
+= set config raspios.config.file to raspios_lite_arm64.json
+= set config raspios.arch to arm64
+= set config raspios.version to 2020-08-24
+= set config raspios.file to 2020-08-20-raspios-buster-arm64-lite
+= set config raspios.image.output to raspios_lite_arm64.img
+= set config ubuntu.config.file to ubuntu_server_20.10_arm64.json
+= set config ubuntu.output to ubuntu-20.04.img
+= set config ubuntu.arch to arm64
+= set config ubuntu.version to 20.10
+= set config ubuntu.file to ubuntu-20.10-preinstalled-server-arm64+raspi
 
-// or
-$ sudo packer build boards/ubuntu_server_20.10_arm64.json
+Usage: ./cluster.sh {build <all|raspios|ubuntu> | other} [options...]
+
+ options:
+    --working-directory=<...>       change current working directory
+    --config-path=<...>             change configuration file location path
+    --config-name=<...>             change configuration file name (current 'config.properties')
+
+    --enable-debug                  enable debug mode for ./cluster.sh
+    --enable-packer-log             enable packer extra logs
+
+ cmd:
+    build                           build packer image <all|raspios|ubuntu>
+```
+
+```bash
+# sudo apt purge qemu-user-static
+sudo update-binfmts --enable qemu-aarch64
+```
+
+```bash
+$ sudo update-binfmts --display
+arm (enabled):
+     package = <local>
+        type = magic
+      offset = 0
+       magic = \x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00
+        mask = \xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff
+ interpreter = /usr/bin/qemu-aarch64-static
+    detector =
+cli (disabled):
+     package = mono-runtime
+        type = magic
+      offset = 0
+       magic = MZ
+        mask =
+ interpreter = /usr/bin/cli
+    detector = /usr/lib/cli/binfmt-detector-cli
+i386 (disabled):
+     package = <local>
+        type = magic
+      offset = 0
+       magic = \x7fELF\x01\x01\x01\x03\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\x03\x00\x01\x00\x00\x00
+        mask = \xff\xff\xff\xff\xff\xff\xff\xfc\xff\xff\xff\xff\xff\xff\xff\xff\xf8\xff\xff\xff\xff\xff\xff\xff
+ interpreter = /usr/local/bin/qemu-i386
+    detector =
+jar (disabled):
+     package = openjdk-11
+        type = magic
+      offset = 0
+       magic = PK\x03\x04
+        mask =
+ interpreter = /usr/bin/jexec
+    detector =
+python2.7 (disabled):
+     package = python2.7
+        type = magic
+      offset = 0
+       magic = \x03\xf3\x0d\x0a
+        mask =
+ interpreter = /usr/bin/python2.7
+    detector =
+python3.8 (disabled):
+     package = python3.8
+        type = magic
+      offset = 0
+       magic = \x55\x0d\x0d\x0a
+        mask =
+ interpreter = /usr/bin/python3.8
+    detector =
+python3.9 (disabled):
+     package = python3.9
+        type = magic
+      offset = 0
+       magic = \x61\x0d\x0d\x0a
+        mask =
+ interpreter = /usr/bin/python3.9
+    detector =
+qemu-aarch64 (enabled):
+     package = qemu-user-static
+        type = magic
+      offset = 0
+       magic = \x7f\x45\x4c\x46\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00
+        mask = \xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff
+ interpreter = /usr/libexec/qemu-binfmt/aarch64-binfmt-P
+    detector =
 ```
