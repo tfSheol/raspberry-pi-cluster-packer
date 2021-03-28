@@ -34,12 +34,6 @@ $ sudo cp packer-builder-arm /root/.packer.d/plugins/
 $ sudo update-binfmts --install arm /usr/bin/qemu-aarch64-static --magic '\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00' --mask '\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
 ```
 
-### Fix WSL2
-
-```bash
-$ sudo ln -s /proc/self/mounts /etc/mtab
-```
-
 ## Usage
 
 ```bash
@@ -76,6 +70,42 @@ Usage: ./cluster.sh {build <all|raspios|ubuntu> | other} [options...]
 
  cmd:
     build                           build packer image <all|raspios|ubuntu>
+```
+
+### Config
+
+```properties
+boards=[raspios, ubuntu]
+
+# Global
+# ${CONFIG_}
+image.size=4.5G
+image.type=dos
+packer.type=arm
+qemu.binary=qemu-aarch64-static
+
+# Raspios
+# ${CONFIG_RASPIOS_}
+raspios.config.file=raspios_lite_arm64.json
+raspios.arch=arm64
+raspios.version=2020-08-24
+raspios.file=2020-08-20-raspios-buster-arm64-lite
+raspios.image.output=raspios_lite_arm64.img
+
+# Ubuntu server
+# ${CONFIG_UBUNTU_}
+ubuntu.config.file=ubuntu_server_20.10_arm64.json
+ubuntu.output=ubuntu-20.04.img
+ubuntu.arch=arm64
+ubuntu.version=20.10
+ubuntu.file=ubuntu-20.10-preinstalled-server-arm64+raspi
+```
+
+## Fix
+
+```bash
+# for WSL2
+$ sudo ln -s /proc/self/mounts /etc/mtab
 ```
 
 ```bash
