@@ -32,6 +32,7 @@ $ sudo cp packer-builder-arm /root/.packer.d/plugins/
 
 ```bash
 $ sudo update-binfmts --install arm /usr/bin/qemu-aarch64-static --magic '\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00' --mask '\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+$ sudo update-binfmts --enable qemu-aarch64
 ```
 
 ## Usage
@@ -106,11 +107,6 @@ ubuntu.file=ubuntu-20.10-preinstalled-server-arm64+raspi
 ```bash
 # for WSL2
 $ sudo ln -s /proc/self/mounts /etc/mtab
-```
-
-```bash
-# sudo apt purge qemu-user-static
-sudo update-binfmts --enable qemu-aarch64
 ```
 
 ```bash

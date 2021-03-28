@@ -45,6 +45,15 @@
         "mv /etc/resolv.conf /etc/resolv.conf.bk",
         "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
       ]
+    },
+    {
+      "type": "file",
+      "source": "scripts/tools",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/bootstrap.sh"
     }
   ]
 }

@@ -12,7 +12,6 @@ export CONFIG_ENV_LIST=""
 #
 function setParam() {
     echo "= set param ${1} to ${2}"
-    
     [[ ${1} = [\#!]* ]] || [[ ${1} = "" ]] || param[$1]=${2}
 }
 
