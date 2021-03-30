@@ -139,4 +139,22 @@ if [[ " $1 $2 " =~ (build (${config['boards']// /|})) ]]; then
     exit 0
 fi
 
+if [[ " $1 $2 " =~ ' show ip ' ]]; then
+    echo
+    # pi_ips=$(sudo arp-scan -l | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
+    pi_ips=$(arp.exe -a | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
+    for pi_ip in ${pi_ips// /|}; do
+        if [[ $pi_ip =~ ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})(\|*)([0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}) ]]; then
+            ip=${BASH_REMATCH[1]}
+            mac=${BASH_REMATCH[3]}
+            if [[ $mac =~ dc[-:]a6[-:]32[-:].* ]]; then
+                echo "pi4 version ip:<$ip> mac:<$mac>"
+            else
+                echo "older pi version ip:<$ip> mac:<$mac>"
+            fi
+        fi
+    done
+    exit 0
+fi
+
 help

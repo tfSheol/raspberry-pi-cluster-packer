@@ -4,4 +4,3 @@ set -e
 
 apt-get install -y \
     git
-    pip3
