@@ -3,8 +3,14 @@
 ### Install QEmu & dependencies
 
 ```bash
-$ sudo apt install qemu binfmt-support qemu-user-static
-$ sudo apt-get install qemu-utils qemu-efi-aarch64 qemu-system-arm
+# base tools
+$ sudo apt install -y qemu binfmt-support qemu-user-static
+
+# qemu arm + arrch64
+$ sudo apt-get install -y qemu-utils qemu-efi-aarch64 qemu-system-arm
+
+# extra tools
+$ sudo apt-get install -y gettext-base parted
 ```
 
 ### Install packer 1.7.0 or more
@@ -18,12 +24,17 @@ $ sudo mv packer /usr/local/bin/
 ### Install ARM builder plugin for packer (1.7.0 fix api)
 
 ```bash
-$ git clone https://github.com/mkaczanowski/packer-builder-arm
+# $ git clone https://github.com/mkaczanowski/packer-builder-arm
+$ git clone https://github.com/SwampDragons/packer-builder-arm # tmp fix for packer version 1.7.0 api
 $ cd packer-builder-arm
 $ go mod download
 $ go build
 
+# enable plugin for current user
+$ sudo mkdir -p ~/.packer.d/plugins/
 $ sudo cp packer-builder-arm ~/.packer.d/plugins/
+
+# enable plugin for root user
 $ sudo mkdir -p /root/.packer.d/plugins/
 $ sudo cp packer-builder-arm /root/.packer.d/plugins/
 ```
