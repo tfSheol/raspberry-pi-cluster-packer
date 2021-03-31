@@ -56,6 +56,17 @@ function printJsonDebug() {
     fi
 }
 
+function checkNetwork() {
+    echo
+    echo "check connexion..."
+    curl --silent --output /dev/null --location stackoverflow.com -i
+    if [[ "$?" != 0 ]]; then
+        >&2 echo "error: you need a network to work"
+        exit -1
+    fi
+    echo "ok!"
+}
+
 function help() {
     echo
     echo "Usage: $0 {build <all|${config['boards']// /|}> | other} [options...]" >&2
@@ -70,6 +81,7 @@ function help() {
     echo
     echo " cmd:"
     echo "    build                           build packer image <all|${config['boards']// /|}>"
+    echo "    show ip                         list all raspberry pi ip + mac addresses of your local network"
     echo
     exit 1
 }
@@ -100,6 +112,10 @@ if [[ " $@ " =~ --enable-packer-log ]]; then
     export PACKER_LOG=1
 fi
 
+if [[ " $@ " =~ --help || " $@ " =~ -h ]]; then
+    help
+fi
+
 if [[ ! -f ${param['config.file.path']}/${param['config.file.name']} ]]; then
     echo "error: ${param['config.file.path']}/${param['config.file.name']} not found!"
     exit -1
@@ -122,6 +138,8 @@ function packer() {
     echo $generated_json | sudo packer build -
 }
 
+checkNetwork
+
 if [[ " $1 $2 " =~ ' build all ' ]]; then
     echo
     echo "build all"
@@ -141,8 +159,12 @@ fi
 
 if [[ " $1 $2 " =~ ' show ip ' ]]; then
     echo
-    # pi_ips=$(sudo arp-scan -l | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
-    pi_ips=$(arp.exe -a | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
+    if [[ $(uname -r) =~ WSL2$ ]]; then
+        pi_ips=$(arp.exe -a | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
+    else
+        pi_ips=$(sudo arp-scan -l | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
+    fi
+    # pi_ips=$(arp.exe -a | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
     for pi_ip in ${pi_ips// /|}; do
         if [[ $pi_ip =~ ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})(\|*)([0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}) ]]; then
             ip=${BASH_REMATCH[1]}
