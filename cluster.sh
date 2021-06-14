@@ -35,6 +35,7 @@ function storeConfigVariable() {
     [[ ${1} = [\#!]* ]] || [[ ${1} = "" ]] || config[$1]=${2}
     VAR=${1^^}
     CONFIG_ENV_LIST+="\$CONFIG_${VAR//./_} "
+    CONFIG_ENV+="\"CONFIG_${VAR//./_}=${2}\", "
     export "CONFIG_${VAR//./_}=${2}"
 }
 
@@ -61,7 +62,7 @@ function checkNetwork() {
     echo "check connexion..."
     curl --silent --output /dev/null --location stackoverflow.com -i
     if [[ "$?" != 0 ]]; then
-        >&2 echo "error: you need a network to work"
+        echo >&2 "error: you need a network to work"
         exit -1
     fi
     echo "ok!"
@@ -134,6 +135,8 @@ printDebug "Config file to env variables" "env | grep 'CONFIG_*'"
 function packer() {
     echo ${config["${1}.config.file"]}
     generated_json=$(envsubst "${CONFIG_ENV_LIST}" <boards/${config["${1}.config.file"]})
+    generated_json=$(echo "$generated_json" |
+        jq "(.provisioners[] | select(.script == \"scripts/bootstrap.sh\") | .environment_vars) = [${CONFIG_ENV::-2}]")
     printJsonDebug "Config JSON file" "$generated_json"
     echo $generated_json | sudo packer build -
 }
@@ -164,7 +167,6 @@ if [[ " $1 $2 " =~ ' show ip ' ]]; then
     else
         pi_ips=$(sudo arp-scan -l | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
     fi
-    # pi_ips=$(arp.exe -a | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
     for pi_ip in ${pi_ips// /|}; do
         if [[ $pi_ip =~ ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})(\|*)([0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}) ]]; then
             ip=${BASH_REMATCH[1]}

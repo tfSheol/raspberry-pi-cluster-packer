@@ -2,7 +2,7 @@
 
 set -e
 
-apt-get install install arp-scan
+apt-get install arp-scan -y
 
 cd /usr/share/arp-scan
 get-iab -v -u http://standards.ieee.org/develop/regauth/iab/iab.txt
