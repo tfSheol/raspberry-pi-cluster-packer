@@ -59,13 +59,13 @@ function printJsonDebug() {
 
 function checkNetwork() {
     echo
-    echo "check connexion..."
+    echo ">> check connexion..."
     curl --silent --output /dev/null --location stackoverflow.com -i
     if [[ "$?" != 0 ]]; then
         echo >&2 "error: you need a network to work"
         exit -1
     fi
-    echo "ok!"
+    echo "<< ok!"
 }
 
 function help() {
@@ -133,7 +133,8 @@ done
 printDebug "Config file to env variables" "env | grep 'CONFIG_*'"
 
 function packer() {
-    echo ${config["${1}.config.file"]}
+    echo ">> use configuration json file: ${config["${1}.config.file"]}"
+    echo
     generated_json=$(envsubst "${CONFIG_ENV_LIST}" <boards/${config["${1}.config.file"]})
     generated_json=$(echo "$generated_json" |
         jq "(.provisioners[] | select(.script == \"scripts/bootstrap.sh\") | .environment_vars) = [${CONFIG_ENV::-2}]")
@@ -155,7 +156,7 @@ fi
 
 if [[ " $1 $2 " =~ (build (${config['boards']// /|})) ]]; then
     echo
-    echo ${BASH_REMATCH[0]}
+    echo ">> build ${BASH_REMATCH[2]} image"
     packer "${BASH_REMATCH[2]}"
     exit 0
 fi
