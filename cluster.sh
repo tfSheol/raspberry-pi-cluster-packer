@@ -13,6 +13,8 @@ export CONFIG_ENV_LIST=""
 function setParam() {
     echo "= set param ${1} to ${2}"
     [[ ${1} = [\#!]* ]] || [[ ${1} = "" ]] || param[$1]=${2}
+    VAR=${1^^}
+    CONFIG_ENV+="\"PARAM_${VAR//./_}=${2}\", "
 }
 
 #
@@ -73,16 +75,19 @@ function help() {
     echo "Usage: $0 {build <all|${config['boards']// /|}> | other} [options...]" >&2
     echo
     echo " options:"
-    echo "    --working-directory=<...>       change current working directory"
-    echo "    --config-path=<...>             change configuration file location path"
-    echo "    --config-name=<...>             change configuration file name (current 'config.properties')"
+    echo "    --working-directory=<...>         change current working directory"
+    echo "    --config-path=<...>               change configuration file location path"
+    echo "    --config-name=<...>               change configuration file name (current 'config.properties')"
     echo
-    echo "    --enable-debug                  enable debug mode for $0"
-    echo "    --enable-packer-log             enable packer extra logs"
+    echo "    --enable-debug                    enable debug mode for $0"
+    echo "    --enable-packer-log               enable packer extra logs"
+    echo
+    echo "    --mac-addr=<00:00:00:00:00:00>    set a custom mac addresse"
+    echo "    --hostname=<test-423>             set a custom hostname"
     echo
     echo " cmd:"
-    echo "    build                           build packer image <all|${config['boards']// /|}>"
-    echo "    show ip                         list all raspberry pi ip + mac addresses of your local network"
+    echo "    build                             build packer image <all|${config['boards']// /|}>"
+    echo "    show ip                           list all raspberry pi ip + mac addresses of your local network"
     echo
     exit 1
 }
@@ -105,6 +110,14 @@ if [[ " $@ " =~ --config-name=([^' ']+) ]]; then
     setParam "config.file.name" ${BASH_REMATCH[1]}
 fi
 
+if [[ " $@ " =~ --mac-addr=(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})) ]]; then
+    setParam "mac.addr" ${BASH_REMATCH[1]}
+fi
+
+if [[ " $@ " =~ --hostname=([^' ']+) ]]; then
+    setParam "hostname" ${BASH_REMATCH[1]}
+fi
+
 if [[ " $@ " =~ --enable-debug ]]; then
     setParam "debug" "true"
 fi
@@ -113,7 +126,7 @@ if [[ " $@ " =~ --enable-packer-log ]]; then
     export PACKER_LOG=1
 fi
 
-if [[ " $@ " =~ --help || " $@ " =~ -h ]]; then
+if [[ " $@ " =~ --help ]]; then
     help
 fi
 
@@ -129,6 +142,12 @@ for line in ${config_file// /}; do
         setConfig ${BASH_REMATCH[1]} ${BASH_REMATCH[2]}
     fi
 done
+
+if [[ " $@ " =~ --enable-custom-output ]]; then
+    if [[ "${param['hostname']}" != "" && "${param['mac.addr']}" != "" ]]; then
+        setConfig "raspios.image.output" "raspios-${param['hostname']}-${param['mac.addr']//:/-}.img"
+    fi
+fi
 
 printDebug "Config file to env variables" "env | grep 'CONFIG_*'"
 
