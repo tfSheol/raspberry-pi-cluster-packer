@@ -23,9 +23,3 @@ CONFIG_FILE=inventory/mycluster/hosts.yaml python3 contrib/inventory_builder/inv
 # Review and change parameters under ``inventory/mycluster/group_vars``
 # cat inventory/mycluster/group_vars/all/all.yml
 # cat inventory/mycluster/group_vars/k8s-cluster/k8s-cluster.yml
-
-# Deploy Kubespray with Ansible Playbook - run the playbook as root
-# The option `--become` is required, as for example writing SSL keys in /etc/,
-# installing packages and interacting with various systemd daemons.
-# Without --become the playbook will fail to run!
-#ansible-playbook -i inventory/mycluster/hosts.yaml --become --become-user=root cluster.yml

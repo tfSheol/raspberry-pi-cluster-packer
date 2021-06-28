@@ -97,6 +97,7 @@ setParam "working.directory" "."
 setParam "config.file.path" "."
 setParam "config.file.name" "config.properties"
 setParam "debug" "false"
+setParam "increment" "1"
 
 if [[ " $@ " =~ --working-directory=([^' ']+) ]]; then
     setParam "working.directory" ${BASH_REMATCH[1]}
@@ -116,6 +117,10 @@ fi
 
 if [[ " $@ " =~ --hostname=([^' ']+) ]]; then
     setParam "hostname" ${BASH_REMATCH[1]}
+fi
+
+if [[ " $@ " =~ --increment=([0-9]+) ]]; then
+    setParam "increment" ${BASH_REMATCH[1]}
 fi
 
 if [[ " $@ " =~ --enable-debug ]]; then
@@ -174,9 +179,20 @@ if [[ " $1 $2 " =~ ' build all ' ]]; then
 fi
 
 if [[ " $1 $2 " =~ (build (${config['boards']// /|})) ]]; then
-    echo
-    echo ">> build ${BASH_REMATCH[2]} image"
-    packer "${BASH_REMATCH[2]}"
+    final_increment_hostname=${param['hostname']:(-2)}
+    final_increment_mac_addr=${param['mac.addr']:(-2)}
+    img=${BASH_REMATCH[2]}
+    for increment in $(seq 1 ${param['increment']}); do
+        echo
+        if [[ "${param['hostname']}" != "" && "${param['mac.addr']}" != "" && ${param['increment']} > 1 ]]; then
+            echo ">> init increment: $increment"
+            setParam "hostname" "${param['hostname']:0:(-1)}$(($final_increment_hostname+$increment))"
+            setParam "mac.addr" "${param['mac.addr']:0:(-1)}$(($final_increment_mac_addr+$increment))"
+            setConfig "raspios.image.output" "raspios-${param['hostname']}-${param['mac.addr']//:/-}.img"
+        fi
+        echo ">> build ${img} image"
+        packer "${img}"
+        done
     exit 0
 fi
 

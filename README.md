@@ -1,5 +1,22 @@
 ## Full install for WSL2 or other linux
 
+### Startup
+
+```bash
+$ ./cluster.sh build raspios --enable-debug --mac-addr=dc:a6:32:01:01:01 --hostname=pi-010101 --enable-custom-output
+$ ls -1
+raspios-pi-010101-dc-a6-32-01-01-01.img
+```
+
+```bash
+$ ./cluster.sh build raspios --enable-debug --mac-addr=dc:a6:32:01:01:00 --hostname=pi-010100 --enable-custom-output --increment=4
+$ ls -1
+raspios-pi-010101-dc-a6-32-01-01-01.img
+raspios-pi-010102-dc-a6-32-01-01-02.img
+raspios-pi-010103-dc-a6-32-01-01-03.img
+raspios-pi-010104-dc-a6-32-01-01-04.img
+```
+
 ### Install QEmu & dependencies
 
 ```bash
