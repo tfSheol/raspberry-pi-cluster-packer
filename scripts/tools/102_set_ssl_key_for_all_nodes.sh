@@ -4,7 +4,7 @@ set -e
 
 mkdir -p /opt/startup
 
-cat <<EOF > /opt/startup/200_startup_nodes_ssh.sh
+cat <<EOF > /opt/startup/102_startup_nodes_ssh.sh
 #!/usr/bin/env bash
 
 # todo

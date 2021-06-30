@@ -154,6 +154,47 @@ if [[ " $@ " =~ --enable-custom-output ]]; then
     fi
 fi
 
+if [[ " $@ " =~ --skip-update ]]; then
+    setConfig "id.scripts" "${config['id.scripts']//000 /}"
+fi
+
+if [[ " $@ " =~ --skip-all-scripts ]]; then
+    setConfig "id.scripts" ""
+fi
+
+if [[ " $@ " =~ --skip-script=([0-9]+) ]]; then
+    to_skip=${BASH_REMATCH[1]}
+    setConfig "id.scripts" "${config['id.scripts']//$to_skip /}"
+fi
+
+# --skip-scripts=[001,100,102]
+if [[ " $@ " =~ --skip-scripts=\[([^' ']+)\] ]]; then
+    to_skips=${BASH_REMATCH[1]}
+    for to_skip in ${to_skips//,/ }; do
+        setConfig "id.scripts" "${config['id.scripts']//$to_skip /}"
+    done
+fi
+
+if [[ " $@ " =~ --add-script=([0-9]+) ]]; then
+    setConfig "id.scripts" "${config['id.scripts']} ${BASH_REMATCH[1]}"
+fi
+
+# --add-scripts=[001,100,102]
+if [[ " $@ " =~ --add-scripts=\[([^' ']+)\] ]]; then
+    to_adds=${BASH_REMATCH[1]}
+    for to_add in ${to_adds//,/ }; do
+        setConfig "id.scripts" "${config['id.scripts']} ${to_add}"
+    done
+fi
+
+if [[ " $@ " =~ --kubespray ]]; then
+    setConfig "id.scripts" "${config['id.scripts']} ${config['kubespray.id.scripts']}"
+fi
+
+if [[ " $@ " =~ --k0sproject ]]; then
+    setConfig "id.scripts" "${config['id.scripts']} ${config['k0sproject.id.scripts']}"
+fi
+
 printDebug "Config file to env variables" "env | grep 'CONFIG_*'"
 
 function packer() {
