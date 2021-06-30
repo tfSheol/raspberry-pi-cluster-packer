@@ -47,6 +47,11 @@
       ]
     },
     {
+      "type": "file",
+      "source": "scripts/tools",
+      "destination": "/tmp"
+    },
+    {
       "type": "shell",
       "script": "scripts/bootstrap.sh"
     }
