@@ -131,6 +131,13 @@ if [[ " $@ " =~ --enable-packer-log ]]; then
     export PACKER_LOG=1
 fi
 
+if [[ " $@ " =~ --enable-qemu-aarch64 ]]; then
+    sudo update-binfmts --install arm /usr/bin/qemu-aarch64-static \ 
+    --magic '\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00' \ 
+    --mask '\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+    sudo update-binfmts --enable qemu-aarch64
+fi
+
 if [[ " $@ " =~ --help ]]; then
     help
 fi
@@ -203,6 +210,10 @@ function packer() {
     generated_json=$(envsubst "${CONFIG_ENV_LIST}" <boards/${config["${1}.config.file"]})
     generated_json=$(echo "$generated_json" |
         jq "(.provisioners[] | select(.script == \"scripts/bootstrap.sh\") | .environment_vars) = [${CONFIG_ENV::-2}]")
+    if [[ -d ".ssh/" ]]; then
+        generated_json=$(echo "$generated_json" |
+            jq ".provisioners += [{\"type\":\"file\",\"source\":\".ssh\",\"destination\":\"${config['ssh.key.location']}\"}]")
+    fi
     printJsonDebug "Config JSON file" "$generated_json"
     echo $generated_json | sudo packer build -
 }
@@ -255,6 +266,13 @@ if [[ " $1 $2 " =~ ' show ip ' ]]; then
             fi
         fi
     done
+    exit 0
+fi
+
+if [[ " $1 $2 " =~ ' generate ssh-key ' ]]; then
+    echo
+    mkdir -p .ssh
+    ssh-keygen -t rsa -b 4096 -f .ssh/${config['ssh.key.name']} -q -N ""
     exit 0
 fi
 

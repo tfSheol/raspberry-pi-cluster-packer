@@ -1,21 +1,103 @@
-## Full install for WSL2 or other linux
-
-### Startup
-
 ```bash
 $ ./cluster.sh build raspios --enable-debug --mac-addr=dc:a6:32:01:01:01 --hostname=pi-010101 --enable-custom-output
+[...]
 $ ls -1
 raspios-pi-010101-dc-a6-32-01-01-01.img
 ```
 
 ```bash
 $ ./cluster.sh build raspios --enable-debug --mac-addr=dc:a6:32:01:01:00 --hostname=pi-010100 --enable-custom-output --increment=4
+[...]
 $ ls -1
 raspios-pi-010101-dc-a6-32-01-01-01.img
 raspios-pi-010102-dc-a6-32-01-01-02.img
 raspios-pi-010103-dc-a6-32-01-01-03.img
 raspios-pi-010104-dc-a6-32-01-01-04.img
 ```
+
+### Usage
+
+```bash
+$ ./cluster.sh
+= set param working.directory to .
+= set param config.file.path to .
+= set param config.file.name to config.properties
+= set param debug to false
+= set config boards to raspios ubuntu
+= set config image.size to 4.5G
+= set config image.type to dos
+= set config packer.type to arm
+= set config qemu.binary to qemu-aarch64-static
+= set config raspios.config.file to raspios_lite_arm64.json
+= set config raspios.arch to arm64
+= set config raspios.version to 2020-08-24
+= set config raspios.file to 2020-08-20-raspios-buster-arm64-lite
+= set config raspios.image.output to raspios_lite_arm64.img
+= set config ubuntu.config.file to ubuntu_server_20.10_arm64.json
+= set config ubuntu.output to ubuntu-20.04.img
+= set config ubuntu.arch to arm64
+= set config ubuntu.version to 20.10
+= set config ubuntu.file to ubuntu-20.10-preinstalled-server-arm64+raspi
+
+Usage: ./cluster.sh {build <all|raspios|ubuntu> | other} [options...]
+
+ options:
+    --working-directory=<...>       change current working directory
+    --config-path=<...>             change configuration file location path
+    --config-name=<...>             change configuration file name (current 'config.properties')
+
+    --enable-debug                  enable debug mode for ./cluster.sh
+    --enable-packer-log             enable packer extra logs
+
+ cmd:
+    build                           build packer image <all|raspios|ubuntu>
+```
+
+### Config
+
+```properties
+boards=[raspios, ubuntu]
+
+# Global
+# ${CONFIG_*}
+image.size=4.5G
+image.type=dos
+packer.type=arm
+qemu.binary=qemu-aarch64-static
+id.scripts=[000, 001, 002, 003, 004, 005, 100]
+install.tools=[git]
+ssh.key.location=/home/pi
+ssh.key.name=id_rsa
+cluster.ips=[192.168.2.201, 192.168.2.202, 192.168.2.203, 192.168.2.204]
+
+# Raspios
+# ${CONFIG_RASPIOS_*}
+raspios.config.file=raspios_lite_arm64.json
+raspios.arch=arm64
+raspios.version=2020-08-24
+raspios.file=2020-08-20-raspios-buster-arm64-lite
+raspios.image.output=raspios_lite_arm64.img
+
+# Ubuntu server
+# ${CONFIG_UBUNTU_*}
+ubuntu.config.file=ubuntu_server_20.10_arm64.json
+ubuntu.output=ubuntu-20.04.img
+ubuntu.arch=arm64
+ubuntu.version=20.10
+ubuntu.file=ubuntu-20.10-preinstalled-server-arm64+raspi
+
+# Kubespray
+# ${CONFIG_KUBESPRAY_*}
+# --kubespray
+kubespray.id.scripts=[101, 200, 201]
+
+# k0sproject
+# ${CONFIG_KOSPROJECT_*}
+# --k0sproject
+k0sproject.id.scripts=[101, 300, 301]
+```
+
+## Full install for WSL2 or other linux
 
 ### Install QEmu & dependencies
 
@@ -63,74 +145,7 @@ $ sudo update-binfmts --install arm /usr/bin/qemu-aarch64-static --magic '\x7fEL
 $ sudo update-binfmts --enable qemu-aarch64
 ```
 
-## Usage
-
-```bash
-$ ./cluster.sh
-= set param working.directory to .
-= set param config.file.path to .
-= set param config.file.name to config.properties
-= set param debug to false
-= set config boards to raspios ubuntu
-= set config image.size to 4.5G
-= set config image.type to dos
-= set config packer.type to arm
-= set config qemu.binary to qemu-aarch64-static
-= set config raspios.config.file to raspios_lite_arm64.json
-= set config raspios.arch to arm64
-= set config raspios.version to 2020-08-24
-= set config raspios.file to 2020-08-20-raspios-buster-arm64-lite
-= set config raspios.image.output to raspios_lite_arm64.img
-= set config ubuntu.config.file to ubuntu_server_20.10_arm64.json
-= set config ubuntu.output to ubuntu-20.04.img
-= set config ubuntu.arch to arm64
-= set config ubuntu.version to 20.10
-= set config ubuntu.file to ubuntu-20.10-preinstalled-server-arm64+raspi
-
-Usage: ./cluster.sh {build <all|raspios|ubuntu> | other} [options...]
-
- options:
-    --working-directory=<...>       change current working directory
-    --config-path=<...>             change configuration file location path
-    --config-name=<...>             change configuration file name (current 'config.properties')
-
-    --enable-debug                  enable debug mode for ./cluster.sh
-    --enable-packer-log             enable packer extra logs
-
- cmd:
-    build                           build packer image <all|raspios|ubuntu>
-```
-
-### Config
-
-```properties
-boards=[raspios, ubuntu]
-
-# Global
-# ${CONFIG_}
-image.size=4.5G
-image.type=dos
-packer.type=arm
-qemu.binary=qemu-aarch64-static
-
-# Raspios
-# ${CONFIG_RASPIOS_}
-raspios.config.file=raspios_lite_arm64.json
-raspios.arch=arm64
-raspios.version=2020-08-24
-raspios.file=2020-08-20-raspios-buster-arm64-lite
-raspios.image.output=raspios_lite_arm64.img
-
-# Ubuntu server
-# ${CONFIG_UBUNTU_}
-ubuntu.config.file=ubuntu_server_20.10_arm64.json
-ubuntu.output=ubuntu-20.04.img
-ubuntu.arch=arm64
-ubuntu.version=20.10
-ubuntu.file=ubuntu-20.10-preinstalled-server-arm64+raspi
-```
-
-## Fix
+### Fix
 
 ```bash
 # for WSL2
