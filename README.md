@@ -15,6 +15,10 @@ raspios-pi-010103-dc-a6-32-01-01-03.img
 raspios-pi-010104-dc-a6-32-01-01-04.img
 ```
 
+```bash
+$ ./cluster.sh build raspios --enable-debug --mac-addr=dc:a6:32:01:01:00 --hostname=pi-010100 --enable-custom-output --increment=2 --kubespray --enable-qemu-aarch64
+```
+
 ### Usage
 
 ```bash

@@ -132,10 +132,10 @@ if [[ " $@ " =~ --enable-packer-log ]]; then
 fi
 
 if [[ " $@ " =~ --enable-qemu-aarch64 ]]; then
-    sudo update-binfmts --install arm /usr/bin/qemu-aarch64-static \
+    update-binfmts --install arm /usr/bin/qemu-aarch64-static \
     --magic '\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00' \
     --mask '\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-    sudo update-binfmts --enable qemu-aarch64
+    update-binfmts --enable qemu-aarch64
 fi
 
 if [[ " $@ " =~ --help ]]; then

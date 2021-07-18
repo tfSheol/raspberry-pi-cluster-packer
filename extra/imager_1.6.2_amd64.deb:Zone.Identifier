@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://www.raspberrypi.org/
+HostUrl=https://downloads.raspberrypi.org/imager/imager_1.6.2_amd64.deb

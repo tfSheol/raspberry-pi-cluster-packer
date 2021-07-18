@@ -13,7 +13,8 @@ cat <<EOF > /opt/startup/201_startup_ansible.sh
 # Without --become the playbook will fail to run!
 
 cd /opt/kubespray
-ansible-playbook -i inventory/mycluster/hosts.yaml --become --become-user=root cluster.yml
+# Run manualy on the first master node
+# ansible-playbook -i inventory/mycluster/hosts.yaml --become --become-user=root cluster.yml
 EOF
 
 chmod +x /opt/startup/201_startup_ansible.sh
