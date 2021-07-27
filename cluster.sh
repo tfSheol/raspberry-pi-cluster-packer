@@ -2,6 +2,8 @@
 
 set -e
 
+VERSION="0.4.1"
+
 typeset -A config
 typeset -A param
 
@@ -14,7 +16,9 @@ function setParam() {
     echo "= set param ${1} to ${2}"
     [[ ${1} = [\#!]* ]] || [[ ${1} = "" ]] || param[$1]=${2}
     VAR=${1^^}
+    CONFIG_ENV_LIST+="\$PARAM_${VAR//./_} "
     CONFIG_ENV+="\"PARAM_${VAR//./_}=${2}\", "
+    export "PARAM_${VAR//./_}=${2}"
 }
 
 #
@@ -98,6 +102,10 @@ setParam "config.file.path" "."
 setParam "config.file.name" "config.properties"
 setParam "debug" "false"
 setParam "increment" "1"
+# arm64 / armhf
+setParam "arch" "arm64"
+# aarch64 / arm
+setParam "arch.qemu" "aarch64"
 
 if [[ " $@ " =~ --working-directory=([^' ']+) ]]; then
     setParam "working.directory" ${BASH_REMATCH[1]}
@@ -119,6 +127,10 @@ if [[ " $@ " =~ --hostname=([^' ']+) ]]; then
     setParam "hostname" ${BASH_REMATCH[1]}
 fi
 
+if [[ " $@ " =~ --arch=([^' ']+) ]]; then
+    setParam "arch" ${BASH_REMATCH[1]}
+fi
+
 if [[ " $@ " =~ --increment=([0-9]+) ]]; then
     setParam "increment" ${BASH_REMATCH[1]}
 fi
@@ -132,10 +144,11 @@ if [[ " $@ " =~ --enable-packer-log ]]; then
 fi
 
 if [[ " $@ " =~ --enable-qemu-aarch64 ]]; then
-    update-binfmts --install arm /usr/bin/qemu-aarch64-static \
-    --magic '\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00' \
-    --mask '\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-    update-binfmts --enable qemu-aarch64
+    setParam "arch.qemu" "aarch64"
+fi
+
+if [[ " $@ " =~ --enable-qemu-arm ]]; then
+    setParam "arch.qemu" "arm"
 fi
 
 if [[ " $@ " =~ --help ]]; then
@@ -157,7 +170,7 @@ done
 
 if [[ " $@ " =~ --enable-custom-output ]]; then
     if [[ "${param['hostname']}" != "" && "${param['mac.addr']}" != "" ]]; then
-        setConfig "raspios.image.output" "raspios-${param['hostname']}-${param['mac.addr']//:/-}.img"
+        setConfig "raspios.image.output" "raspios-${param['arch']}-${param['arch.qemu']}-${param['hostname']}-${param['mac.addr']//:/-}.img"
     fi
 fi
 
@@ -202,6 +215,18 @@ if [[ " $@ " =~ --k0sproject ]]; then
     setConfig "id.scripts" "${config['id.scripts']} ${config['k0sproject.id.scripts']}"
 fi
 
+if [[ " $@ " =~ --k3s ]]; then
+    setConfig "id.scripts" "${config['id.scripts']} ${config['k3s.id.scripts']}"
+fi
+
+if [[ " $@ " =~ --rancher ]]; then
+    setConfig "id.scripts" "${config['id.scripts']} ${config['rancher.id.scripts']}"
+fi
+
+if [[ " $@ " =~ --docker-rancher ]]; then
+    setConfig "id.scripts" "${config['id.scripts']} ${config['docker.rancher.id.scripts']}"
+fi
+
 printDebug "Config file to env variables" "env | grep 'CONFIG_*'"
 
 function packer() {
@@ -240,7 +265,7 @@ if [[ " $1 $2 " =~ (build (${config['boards']// /|})) ]]; then
             echo ">> init increment: $increment"
             setParam "hostname" "${param['hostname']:0:(-1)}$(($final_increment_hostname+$increment))"
             setParam "mac.addr" "${param['mac.addr']:0:(-1)}$(($final_increment_mac_addr+$increment))"
-            setConfig "raspios.image.output" "raspios-${param['hostname']}-${param['mac.addr']//:/-}.img"
+            setConfig "raspios.image.output" "raspios-${param['arch']}-${param['arch.qemu']}-${param['hostname']}-${param['mac.addr']//:/-}.img"
         fi
         echo ">> build ${img} image"
         packer "${img}"

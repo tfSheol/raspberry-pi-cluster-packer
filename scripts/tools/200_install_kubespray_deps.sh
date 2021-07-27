@@ -20,7 +20,7 @@ cp -rfp inventory/sample inventory/mycluster
 declare -a IPS=(${CONFIG_CLUSTER_IPS})
 CONFIG_FILE=inventory/mycluster/hosts.yaml python3 contrib/inventory_builder/inventory.py ${IPS[@]}
 
-chown pi:pi /opt/kubespray -R
+chown ${CONFIG_SYSTEM_USER}:${CONFIG_SYSTEM_USER} /opt/kubespray -R
 
 # Review and change parameters under ``inventory/mycluster/group_vars``
 # cat inventory/mycluster/group_vars/all/all.yml

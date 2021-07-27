@@ -18,8 +18,27 @@ raspios-pi-010104-dc-a6-32-01-01-04.img
 ```bash
 $ ./cluster.sh build raspios --enable-debug --mac-addr=dc:a6:32:01:01:00 --hostname=pi-010100 --enable-custom-output --increment=2 --kubespray --enable-qemu-aarch64
 ```
+## K3s Cluster example with raspios
 
-### Usage
+### pi4 - K3s Cluster (4 members) (16 ❤️, 32Go)
+
+```bash
+$ ./cluster.sh build raspios --enable-debug --mac-addr=dc:a6:32:05:01:00 --hostname=pi-050100 --enable-custom-output --increment=4 --enable-qemu-aarch64 --arch=arm64 --k3s
+```
+
+### pi3 - K3s Cluster (docker)
+
+```bash
+./cluster.sh build raspios --enable-debug --mac-addr=b8:27:eb:05:00:01 --hostname=pi-050001 --enable-custom-output --enable-qemu-aarch64 --arch=arm64 --add-scripts=[150]
+```
+
+### pi0 - K3s Cluster (MQTT server + Humidity captor)
+
+```bash
+./cluster.sh build raspios --enable-debug --mac-addr=b8:27:eb:05:00:02 --hostname=pi-050002 --enable-custom-output --enable-qemu-arm --arch=armhf --add-scripts=[103, 104]
+```
+
+## Usage
 
 ```bash
 $ ./cluster.sh
@@ -57,7 +76,7 @@ Usage: ./cluster.sh {build <all|raspios|ubuntu> | other} [options...]
     build                           build packer image <all|raspios|ubuntu>
 ```
 
-### Config
+## Config
 
 ```properties
 boards=[raspios, ubuntu]
@@ -144,9 +163,12 @@ $ sudo cp packer-builder-arm /root/.packer.d/plugins/
 
 ### Enable QEmu aarch64 support
 
+Install all support arch for qemu
+
 ```bash
-$ sudo update-binfmts --install arm /usr/bin/qemu-aarch64-static --magic '\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00' --mask '\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-$ sudo update-binfmts --enable qemu-aarch64
+$ curl -O https://raw.githubusercontent.com/qemu/qemu/master/scripts/qemu-binfmt-conf.sh
+$ chmod +x qemu-binfmt-conf.sh
+$ sudo ./qemu-binfmt-conf.sh --qemu-suffix "-static" --qemu-path /usr/bin
 ```
 
 ### Fix
@@ -154,72 +176,4 @@ $ sudo update-binfmts --enable qemu-aarch64
 ```bash
 # for WSL2
 $ sudo ln -s /proc/self/mounts /etc/mtab
-```
-
-```bash
-$ sudo update-binfmts --display
-arm (enabled):
-     package = <local>
-        type = magic
-      offset = 0
-       magic = \x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00
-        mask = \xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff
- interpreter = /usr/bin/qemu-aarch64-static
-    detector =
-cli (disabled):
-     package = mono-runtime
-        type = magic
-      offset = 0
-       magic = MZ
-        mask =
- interpreter = /usr/bin/cli
-    detector = /usr/lib/cli/binfmt-detector-cli
-i386 (disabled):
-     package = <local>
-        type = magic
-      offset = 0
-       magic = \x7fELF\x01\x01\x01\x03\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\x03\x00\x01\x00\x00\x00
-        mask = \xff\xff\xff\xff\xff\xff\xff\xfc\xff\xff\xff\xff\xff\xff\xff\xff\xf8\xff\xff\xff\xff\xff\xff\xff
- interpreter = /usr/local/bin/qemu-i386
-    detector =
-jar (disabled):
-     package = openjdk-11
-        type = magic
-      offset = 0
-       magic = PK\x03\x04
-        mask =
- interpreter = /usr/bin/jexec
-    detector =
-python2.7 (disabled):
-     package = python2.7
-        type = magic
-      offset = 0
-       magic = \x03\xf3\x0d\x0a
-        mask =
- interpreter = /usr/bin/python2.7
-    detector =
-python3.8 (disabled):
-     package = python3.8
-        type = magic
-      offset = 0
-       magic = \x55\x0d\x0d\x0a
-        mask =
- interpreter = /usr/bin/python3.8
-    detector =
-python3.9 (disabled):
-     package = python3.9
-        type = magic
-      offset = 0
-       magic = \x61\x0d\x0d\x0a
-        mask =
- interpreter = /usr/bin/python3.9
-    detector =
-qemu-aarch64 (enabled):
-     package = qemu-user-static
-        type = magic
-      offset = 0
-       magic = \x7f\x45\x4c\x46\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00
-        mask = \xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff
- interpreter = /usr/libexec/qemu-binfmt/aarch64-binfmt-P
-    detector =
 ```

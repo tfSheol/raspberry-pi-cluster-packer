@@ -4,21 +4,28 @@ set -e
 
 mkdir -p /opt/startup
 
-echo "pi ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers.d/010_pi-nopasswd
+echo "${CONFIG_SYSTEM_USER} ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers.d/010_pi-nopasswd
 cat /etc/sudoers.d/010_pi-nopasswd
-
-chown pi:pi /home/pi/.ssh/ -R
 
 cat <<EOF > /opt/startup/102_startup_nodes_ssh.sh
 #!/usr/bin/env bash
 
-# todo
+chown ${CONFIG_SYSTEM_USER}:${CONFIG_SYSTEM_USER} ${CONFIG_SSH_KEY_LOCATION}/.ssh/ -R
 
-echo "raspberry" | sshpass ssh-copy-id -f -o StrictHostKeyChecking=no 192.168.2.202
-echo "raspberry" | sshpass ssh-copy-id -f -o StrictHostKeyChecking=no 192.168.2.202
-echo "raspberry" | sshpass ssh-copy-id -f -o StrictHostKeyChecking=no 192.168.2.202
-echo "raspberry" | sshpass ssh-copy-id -f -o StrictHostKeyChecking=no 192.168.2.202
+for host in ${CONFIG_CLUSTER_IPS}; do
+  echo "${CONFIG_SYSTEM_USER_PASSWORD}" | sshpass ssh-copy-id -f -o StrictHostKeyChecking=no \$host
+done
 
+cat <<SEOF > /opt/startup/102_startup_nodes_ssh.sh
+#!/usr/bin/env bash
+
+chown ${CONFIG_SYSTEM_USER}:${CONFIG_SYSTEM_USER} ${CONFIG_SSH_KEY_LOCATION}/.ssh/ -R
+
+for host in ${CONFIG_CLUSTER_IPS}; do
+  echo "\$1" | sshpass ssh-copy-id -f -o StrictHostKeyChecking=no \$host
+done
+
+SEOF
 
 EOF
 
