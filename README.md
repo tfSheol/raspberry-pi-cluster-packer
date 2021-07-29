@@ -29,13 +29,13 @@ $ ./cluster.sh build raspios --enable-debug --mac-addr=dc:a6:32:05:01:00 --hostn
 ### pi3 - K3s Cluster (docker)
 
 ```bash
-./cluster.sh build raspios --enable-debug --mac-addr=b8:27:eb:05:00:01 --hostname=pi-050001 --enable-custom-output --enable-qemu-aarch64 --arch=arm64 --add-scripts=[150]
+$ ./cluster.sh build raspios --enable-debug --mac-addr=b8:27:eb:05:00:01 --hostname=pi-050001 --enable-custom-output --enable-qemu-aarch64 --arch=arm64 --add-scripts=[150]
 ```
 
 ### pi0 - K3s Cluster (MQTT server + Humidity captor)
 
 ```bash
-./cluster.sh build raspios --enable-debug --mac-addr=b8:27:eb:05:00:02 --hostname=pi-050002 --enable-custom-output --enable-qemu-arm --arch=armhf --add-scripts=[103, 104]
+$ ./cluster.sh build raspios --enable-debug --mac-addr=b8:27:eb:05:00:02 --hostname=pi-050002 --enable-custom-output --enable-qemu-arm --arch=armhf --add-scripts=[103, 104]
 ```
 
 ## Usage

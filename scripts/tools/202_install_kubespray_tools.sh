@@ -5,7 +5,7 @@ set -e
 mkdir -p /opt/tools/kubespray
 
 # init_cluster.sh
-cat <<EOF > /opt/tools/kubespray/02_init_cluster.sh
+cat <<EOF > /opt/tools/kubespray/01_init_cluster.sh
 #!/usr/bin/env bash
 
 cd /opt/kubespray
@@ -16,22 +16,13 @@ exit 0
 EOF
 
 # init_dashboard.sh
-cat <<EOF > /opt/tools/kubespray/03_init_dashboard.sh
+cat <<EOF > /opt/tools/kubespray/02_init_dashboard.sh
 #!/usr/bin/env bash
 
 kubectl create -f contrib/misc/clusteradmin-rbac.yml
 kubectl -n kube-system describe secret kubernetes-dashboard-token | grep 'token:' | grep -o '[^ ]\+$'
 
 exit 0
-EOF
-
-# init_ssh.sh
-cat <<EOF > /opt/tools/kubespray/01_init_ssh.sh
-#!/usr/bin/env bash
-
-for host in ${CONFIG_CLUSTER_IPS}; do
-  echo "raspberry" | sshpass ssh-copy-id -f -o StrictHostKeyChecking=no \$host
-done
 EOF
 
 # add_node.sh

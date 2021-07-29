@@ -2,13 +2,19 @@
 
 set -e
 
+# You can run & build x86 image over arm :
+# https://ownyourbits.com/2018/06/27/running-and-building-arm-docker-containers-in-x86/
+# https://www.stereolabs.com/docs/docker/building-arm-container-on-x86/
+
 apt-get update
 apt-get install \
     apt-transport-https \
     ca-certificates \
     curl \
     gnupg \
-    lsb-release -y
+    lsb-release \
+    qemu binfmt-support \
+    qemu-user -y
 
 curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
