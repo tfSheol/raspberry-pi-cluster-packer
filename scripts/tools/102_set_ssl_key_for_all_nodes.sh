@@ -22,7 +22,7 @@ cat <<SEOF > /opt/startup/102_startup_nodes_ssh.sh
 chown ${CONFIG_SYSTEM_USER}:${CONFIG_SYSTEM_USER} ${CONFIG_SSH_KEY_LOCATION}/.ssh/ -R
 
 for host in ${CONFIG_CLUSTER_IPS}; do
-  echo "\$1" | sshpass ssh-copy-id -f -o StrictHostKeyChecking=no \$host
+  echo "\\$1" | sshpass ssh-copy-id -f -o StrictHostKeyChecking=no \\$host
 done
 
 SEOF

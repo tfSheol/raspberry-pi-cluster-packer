@@ -13,8 +13,7 @@ apt-get install \
     curl \
     gnupg \
     lsb-release \
-    qemu binfmt-support \
-    qemu-user -y
+    qemu binfmt-support -y
 
 curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
@@ -33,7 +32,6 @@ echo \
 apt-get update
 apt-get install docker-ce docker-ce-cli containerd.io -y
 
-groupadd docker
 usermod -aG docker ${CONFIG_SYSTEM_USER}
 
 apt-get clean && rm -rf /var/lib/apt/lists/*

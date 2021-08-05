@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION="0.4.1"
+VERSION="0.5.3"
 
 typeset -A config
 typeset -A param
@@ -87,13 +87,21 @@ function help() {
     echo "    --enable-packer-log               enable packer extra logs"
     echo
     echo "    --mac-addr=<00:00:00:00:00:00>    set a custom mac addresse"
-    echo "    --hostname=<test-423>             set a custom hostname"
+    echo "    --hostname=<pi-423>               set a custom hostname"
+    echo "    --increment=<nb>                  set a nb of images you whant to generate, this auto increment hostname and mac addresse"
+    echo
+    echo "    --enable-qemu-aarch64             set arch to arm64"
+    echo "    --enable-qemu-arm                 set arch to armhf"
+    echo
+    echo "    --enable-debug                    show debug msg and config file during the process"
+    echo
+    echo "    --version                         print a current version of $0"
     echo
     echo " cmd:"
     echo "    build                             build packer image <all|${config['boards']// /|}>"
     echo "    show ip                           list all raspberry pi ip + mac addresses of your local network"
-    echo
-    exit 1
+    echo "    generate ssh-key                  run ssh-keygen -t rsa -b 4096 -f .ssh/${config['ssh.key.name']}"
+    exit 0
 }
 
 # Default params config set
@@ -102,8 +110,6 @@ setParam "config.file.path" "."
 setParam "config.file.name" "config.properties"
 setParam "debug" "false"
 setParam "increment" "1"
-# arm64 / armhf
-setParam "arch" "arm64"
 # aarch64 / arm
 setParam "arch.qemu" "aarch64"
 
@@ -127,10 +133,6 @@ if [[ " $@ " =~ --hostname=([^' ']+) ]]; then
     setParam "hostname" ${BASH_REMATCH[1]}
 fi
 
-if [[ " $@ " =~ --arch=([^' ']+) ]]; then
-    setParam "arch" ${BASH_REMATCH[1]}
-fi
-
 if [[ " $@ " =~ --increment=([0-9]+) ]]; then
     setParam "increment" ${BASH_REMATCH[1]}
 fi
@@ -145,10 +147,12 @@ fi
 
 if [[ " $@ " =~ --enable-qemu-aarch64 ]]; then
     setParam "arch.qemu" "aarch64"
+    setParam "arch" "arm64"
 fi
 
 if [[ " $@ " =~ --enable-qemu-arm ]]; then
     setParam "arch.qemu" "arm"
+    setParam "arch" "armhf"
 fi
 
 if [[ " $@ " =~ --help ]]; then
@@ -168,9 +172,15 @@ for line in ${config_file// /}; do
     fi
 done
 
+if [[ " $@ " =~ --custom-output=([^' ']+) ]]; then
+    setConfig "raspios.image.output" "raspios-${BASH_REMATCH[1]}.img"
+fi
+
 if [[ " $@ " =~ --enable-custom-output ]]; then
     if [[ "${param['hostname']}" != "" && "${param['mac.addr']}" != "" ]]; then
         setConfig "raspios.image.output" "raspios-${param['arch']}-${param['arch.qemu']}-${param['hostname']}-${param['mac.addr']//:/-}.img"
+    else
+        setConfig "raspios.image.output" "raspios-${param['arch']}-${param['arch.qemu']}-${param['hostname']}.img"
     fi
 fi
 
@@ -227,6 +237,11 @@ if [[ " $@ " =~ --docker-rancher ]]; then
     setConfig "id.scripts" "${config['id.scripts']} ${config['docker.rancher.id.scripts']}"
 fi
 
+if [[ " $@ " =~ --version ]]; then
+    echo ${VERSION}
+    exit 0
+fi
+
 printDebug "Config file to env variables" "env | grep 'CONFIG_*'"
 
 function packer() {
@@ -261,11 +276,15 @@ if [[ " $1 $2 " =~ (build (${config['boards']// /|})) ]]; then
     img=${BASH_REMATCH[2]}
     for increment in $(seq 1 ${param['increment']}); do
         echo
-        if [[ "${param['hostname']}" != "" && "${param['mac.addr']}" != "" && ${param['increment']} > 1 ]]; then
+        if [[ "${param['hostname']}" != "" && ${param['increment']} > 1 ]]; then
             echo ">> init increment: $increment"
             setParam "hostname" "${param['hostname']:0:(-1)}$(($final_increment_hostname+$increment))"
-            setParam "mac.addr" "${param['mac.addr']:0:(-1)}$(($final_increment_mac_addr+$increment))"
-            setConfig "raspios.image.output" "raspios-${param['arch']}-${param['arch.qemu']}-${param['hostname']}-${param['mac.addr']//:/-}.img"
+            if [[ "${param['mac.addr']}" != "" ]]; then
+                setParam "mac.addr" "${param['mac.addr']:0:(-1)}$(($final_increment_mac_addr+$increment))"
+                setConfig "raspios.image.output" "raspios-${param['arch']}-${param['arch.qemu']}-${param['hostname']}-${param['mac.addr']//:/-}.img"
+            else
+                setConfig "raspios.image.output" "raspios-${param['arch']}-${param['arch.qemu']}-${param['hostname']}.img"
+            fi
         fi
         echo ">> build ${img} image"
         packer "${img}"

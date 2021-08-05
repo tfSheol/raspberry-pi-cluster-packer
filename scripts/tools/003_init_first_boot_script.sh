@@ -17,6 +17,8 @@ cat <<EOF > /etc/init.d/bootstrap
 # Description:       Init pi with startup scripts.
 ### END INIT INFO
 
+mkdir -p /opt/startup
+
 exec 1>>/opt/startup/startup.log
 exec 2>&1
 
