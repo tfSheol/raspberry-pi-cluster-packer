@@ -30,7 +30,7 @@ $ ./cluster.sh build raspios --hostname=pi-maintenance --enable-qemu-aarch64 --a
 ### pi4 - K3s Cluster (4 members) (16 ❤️, 32Go)
 
 ```bash
-$ ./cluster.sh build raspios --hostname=pi-050100 --enable-custom-output --increment=4 --enable-qemu-aarch64 --k3s --add-script=141 --skip-script=000
+$ ./cluster.sh build raspios --hostname=pi-050100 --enable-custom-output --increment=4 --enable-qemu-aarch64 --k3s --add-scripts=[008,141]
 ```
 
 ### pi3 - K3s Cluster (docker)
@@ -42,7 +42,7 @@ $ ./cluster.sh build raspios --hostname=pi-050001 --enable-custom-output --enabl
 ### pi0 - K3s Cluster (MQTT server + Humidity captor)
 
 ```bash
-$ ./cluster.sh build raspios --hostname=pi-050002 --enable-custom-output --enable-qemu-arm --add-scripts=[103, 104]
+$ ./cluster.sh build raspios --hostname=pi-050002 --enable-custom-output --enable-qemu-arm --add-scripts=[103,104]
 ```
 
 ## Usage
@@ -228,11 +228,17 @@ $ update-rc.d -f qemu-support enable
 $ sudo ln -s /proc/self/mounts /etc/mtab
 ```
 
-If you use an SSD, you must to disable UASP with quirks
+If you use an SSD as boot device, you must to disable UASP over usb 3.0 with `usb-storage.quirks`.
+You can use `008_disable_uasp_for_ssd.sh` script with `quirks` config.
 
 ```bash
+# get id of SATA 6Gb/s bridge [VID]:[PID]
 $ lsusb
-
+Bus 002 Device 003: ID ****:**** JMicron Technology Corp. / JMicron USA Technology Corp. JMS561U two ports SATA 6Gb/s bridge
+Bus 002 Device 001: ID ****:**** Linux Foundation 3.0 root hub
+Bus 001 Device 004: ID ****:****
+Bus 001 Device 002: ID ****:**** VIA Labs, Inc. Hub
+Bus 001 Device 001: ID ****:**** Linux Foundation 2.0 root hub
 ```
 
 ```bash
