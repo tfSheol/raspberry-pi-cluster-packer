@@ -7,7 +7,7 @@
     "file_checksum_type": "sha256",
     "file_target_extension": "zip",
     "image_build_method": "resize",
-    "image_path": "${CONFIG_RASPIOS_IMAGE_OUTPUT}",
+    "image_path": "output/${CONFIG_RASPIOS_IMAGE_OUTPUT}",
     "image_size": "${CONFIG_IMAGE_SIZE}",
     "image_type": "${CONFIG_IMAGE_TYPE}",
     "image_partitions": [
@@ -29,8 +29,8 @@
       }
     ],
     "image_chroot_env": ["PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"],
-    "qemu_binary_source_path": "/usr/bin/qemu-${PARAM_ARCH_QEMU}-static",
-    "qemu_binary_destination_path": "/usr/bin/qemu-${PARAM_ARCH_QEMU}-static"
+    "qemu_binary_source_path": "/usr/bin/qemu-${PARAM_ARCH_QEMU}",
+    "qemu_binary_destination_path": "/usr/bin/qemu-${PARAM_ARCH_QEMU}"
   }],
   "provisioners": [
     {

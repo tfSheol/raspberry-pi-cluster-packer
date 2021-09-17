@@ -195,6 +195,11 @@ $ chmod +x qemu-binfmt-conf.sh
 $ sudo ./qemu-binfmt-conf.sh --qemu-suffix "-static" --qemu-path /usr/bin
 ```
 
+```bash
+# mount /proc/sys/fs/binfmt_misc/ in docker container
+mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc/
+```
+
 Make a startup script to enable qemu-support as root.
 
 ```bash
@@ -308,4 +313,12 @@ $ sudo raspi-config nonint do_change_locale en_US.UTF-8
 
 ```bash
 $ sudo curl https://raw.githubusercontent.com/TheRemote/PiBenchmarks/master/Storage.sh | sudo bash
+```
+
+## Docker
+
+```bash
+# build
+docker build . -t raspberry-cluster-tool
+./wcluster.sh -h
 ```

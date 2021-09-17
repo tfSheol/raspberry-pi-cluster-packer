@@ -321,4 +321,13 @@ if [[ " $1 $2 " =~ ' generate ssh-key ' ]]; then
     exit 0
 fi
 
+if [[ " $1 $2 " =~ ' clean ' ]]; then
+    echo
+    echo "clean output folder & packer_cache folder..."
+    rm -rf output/*.img
+    rm -rf packer_cache/*
+    echo "done."
+    exit 0
+fi
+
 help

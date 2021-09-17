@@ -8,7 +8,7 @@
     "file_target_extension": "xz",
     "file_unarchive_cmd": ["xz", "--decompress", "$ARCHIVE_PATH"],
     "image_build_method": "resize",
-    "image_path": "${CONFIG_UBUNTU_OUTPUT}",
+    "image_path": "output/${CONFIG_UBUNTU_OUTPUT}",
     "image_size": "${CONFIG_IMAGE_SIZE}",
     "image_type": "${CONFIG_IMAGE_TYPE}",
     "image_partitions": [
