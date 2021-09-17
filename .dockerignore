@@ -1,0 +1,9 @@
+./wcluster.sh
+*.img
+.ssh
+.kube
+.git
+packer_cache/
+.gitignore
+.dockerignore
+output/*

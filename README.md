@@ -39,7 +39,7 @@ $ ./cluster.sh build raspios --hostname=pi-050100 --enable-custom-output --incre
 $ ./cluster.sh build raspios --hostname=pi-050001 --enable-custom-output --enable-qemu-aarch64 --add-scripts=[150]
 ```
 
-### pi0 - K3s Cluster (MQTT server + Humidity captor)
+### pi0 - K3s Cluster (MQTT server)
 
 ```bash
 $ ./cluster.sh build raspios --hostname=pi-050002 --enable-custom-output --enable-qemu-arm --add-scripts=[103,104]

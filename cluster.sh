@@ -244,10 +244,11 @@ fi
 
 printDebug "Config file to env variables" "env | grep 'CONFIG_*'"
 
-function packer() {
+function packer_config() {
     echo ">> use configuration json file: ${config["${1}.config.file"]}"
     echo
     generated_json=$(envsubst "${CONFIG_ENV_LIST}" <boards/${config["${1}.config.file"]})
+    printJsonDebug "envsubst" "$generated_json"
     generated_json=$(echo "$generated_json" |
         jq "(.provisioners[] | select(.script == \"scripts/bootstrap.sh\") | .environment_vars) = [${CONFIG_ENV::-2}]")
     if [[ -d ".ssh/" ]]; then
@@ -255,7 +256,7 @@ function packer() {
             jq ".provisioners += [{\"type\":\"file\",\"source\":\".ssh\",\"destination\":\"${config['ssh.key.location']}\"}]")
     fi
     printJsonDebug "Config JSON file" "$generated_json"
-    echo $generated_json | sudo packer build -
+    echo $generated_json | packer build -
 }
 
 checkNetwork
@@ -265,7 +266,7 @@ if [[ " $1 $2 " =~ ' build all ' ]]; then
     echo "build all"
     for board in ${config['boards']}; do
         echo "build $board"
-        packer $board
+        packer_config $board
     done
     exit 0
 fi
@@ -287,7 +288,7 @@ if [[ " $1 $2 " =~ (build (${config['boards']// /|})) ]]; then
             fi
         fi
         echo ">> build ${img} image"
-        packer "${img}"
+        packer_config "${img}"
         done
     exit 0
 fi
@@ -297,7 +298,7 @@ if [[ " $1 $2 " =~ ' show ip ' ]]; then
     if [[ $(uname -r) =~ WSL2$ ]]; then
         pi_ips=$(arp.exe -a | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
     else
-        pi_ips=$(sudo arp-scan -l | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
+        pi_ips=$(arp-scan -l | grep 'dc[-:]a6[-:]32[-:]*\|b8[-:]27[-:]eb[-:]*')
     fi
     for pi_ip in ${pi_ips// /|}; do
         if [[ $pi_ip =~ ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})(\|*)([0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}[-:][0-9a-z]{1,2}) ]]; then
