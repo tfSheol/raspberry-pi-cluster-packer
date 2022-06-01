@@ -23,7 +23,7 @@ node-token=\$(cat /var/lib/rancher/k3s/server/node-token)
 IPS=(${CONFIG_CLUSTER_IPS})
 
 for host in ${CONFIG_CLUSTER_IPS}; do
-  ssh ${CONFIG_SYSTEM_USER}@\$host 'curl -sfL https://get.k3s.io | K3S_NODE_NAME=\\\$(hostname) K3S_TOKEN=\${node-token} sh -s - server https://\${IPS[0]}:6443'
+  ssh ${CONFIG_SYSTEM_USER}@\$host 'curl -sfL https://get.k3s.io | K3S_NODE_NAME=\$(hostname) K3S_TOKEN=\${node-token} sh -s - server https://\${IPS[0]}:6443'
 done
 
 exit 0
