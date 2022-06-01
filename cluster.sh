@@ -237,6 +237,10 @@ if [[ " $@ " =~ --docker-rancher ]]; then
     setConfig "id.scripts" "${config['id.scripts']} ${config['docker.rancher.id.scripts']}"
 fi
 
+if [[ " $@ " =~ --nomad ]]; then
+    setConfig "id.scripts" "${config['id.scripts']} ${config['nomad.id.scripts']}"
+fi
+
 if [[ " $@ " =~ --version ]]; then
     echo ${VERSION}
     exit 0
