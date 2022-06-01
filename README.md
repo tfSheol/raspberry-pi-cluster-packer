@@ -142,6 +142,19 @@ rancher.tls.san=192.168.2.211
 # --docker-rancher
 docker.rancher.id.scripts=[150, 600]
 docker.rancher.version=master-cd623b5d9bbed1628ebe6f3f9687b473e61dbebf-head
+
+# Nomad
+# ${CONFIG_NOMAD_*}
+# --nomad
+nomad.id.scripts=[150, 700, 701]
+nomad.version=1.3.1+ent
+nomad.consul.version=1.12.1
+nomad.datacenter=dc1
+nomad.data.dir=/opt/nomad
+nomad.server.enable=true
+nomad.server.acl=true
+nomad.server.bootstrap_expect=1
+nomad.client.enable=true
 ```
 
 ## Full install for WSL2 or other linux
