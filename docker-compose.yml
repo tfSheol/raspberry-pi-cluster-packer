@@ -1,0 +1,69 @@
+version: '3.9'
+
+name: raspberry-cluster-tool
+
+x-common-variables: &common-variables
+  USER_ID: $USER_ID
+
+x-common-volumes: &common-volumes
+  - type: bind
+    source: ./output
+    target: /app/output
+  - type: bind
+    source: ./packer_cache
+    target: /app/packer_cache
+  - type: bind
+    source: ./.ssh
+    target: /app/.ssh
+    volume:
+      nocopy: true
+  - type: bind
+    source: ./.kube
+    target: /app/.kube
+    volume:
+      nocopy: true
+
+x-tool-service: &tool-service
+  user: '$USER_ID'
+  network_mode: host
+  privileged: true
+  cap_add: ['ALL']
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: raspberry-cluster-tool
+  environment: *common-variables
+  volumes: *common-volumes
+  profiles:
+    - 'tool'
+
+services:
+  bash:
+    <<: *tool-service
+    entrypoint: 'bash'
+    profiles:
+      - 'tool'
+  
+  version:
+    <<: *tool-service
+    entrypoint: ['cluster.sh', '--version']
+
+  docker-rancher:
+    <<: *tool-service
+    entrypoint: ['cluster.sh', 'build', 'all', '--docker-rancher']
+
+  rancher:
+    <<: *tool-service
+    entrypoint: ['cluster.sh', 'build', 'all', '--rancher']
+
+  k3s:
+    <<: *tool-service
+    entrypoint: ['cluster.sh', 'build', 'all', '--k3s']
+
+  k0sproject:
+    <<: *tool-service
+    entrypoint: ['cluster.sh', 'build', 'all', '--k0sproject']
+
+  kubespray:
+    <<: *tool-service
+    entrypoint: ['cluster.sh', 'build', 'all', '--kubespray']
