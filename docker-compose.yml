@@ -3,7 +3,7 @@ version: '3.9'
 name: raspberry-cluster-tool
 
 x-common-variables: &common-variables
-  USER_ID: $USER_ID
+  USER_ID: 1000
 
 x-common-volumes: &common-volumes
   - type: bind
@@ -24,7 +24,6 @@ x-common-volumes: &common-volumes
       nocopy: true
 
 x-tool-service: &tool-service
-  user: '$USER_ID'
   network_mode: host
   privileged: true
   cap_add: ['ALL']
@@ -40,9 +39,7 @@ x-tool-service: &tool-service
 services:
   bash:
     <<: *tool-service
-    entrypoint: 'bash'
-    profiles:
-      - 'tool'
+    entrypoint: ['bash']
   
   version:
     <<: *tool-service

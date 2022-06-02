@@ -2,13 +2,14 @@
 
 source ./lib/lib.sh
 
-COMPOSE_PROFILES=aws,tool
+COMPOSE_PROFILES=tool
 
 compose="docker compose"
 
 if [[ $(command -v docker-compose) != "" ]]; then
   echo -e "-> ${RED}docker-compose v1 detected, please use 'docker compose' commande insted of 'docker-compose'${NC}"
   compose="docker-compose"
+  echo -e "$ sudo rm -rf $(which docker-compose)"
   echo -e "$ sudo apt-get install docker-compose-plugin"
 fi
 
